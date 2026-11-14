@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 세션 · 구조는 AI, 분위기는 내가</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07050F;--ink:#F3F0FF;--mute:#9A95B8;--dim:#6F6A90;--mint:#34E3B2;--vio:#8B7CF6;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.04);
+ --main:#5B4FE0;--peach:#FFC2A8;--navy:#1E1B3A;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;word-break:keep-all;overflow:hidden;display:grid;grid-template-rows:64px 1fr 78px}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(60% 38% at 50% -6%,rgba(91,79,224,.38),transparent 70%),radial-gradient(40% 30% at 92% 104%,rgba(91,79,224,.22),transparent 70%)}
+canvas#fx{position:fixed;inset:0;pointer-events:none}
+.top{position:relative;z-index:2;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 34px;border-bottom:1px solid var(--line);background:rgba(7,5,15,.55);backdrop-filter:blur(8px)}
+.pill{font:inherit;font-size:14px;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 16px 7px 12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;justify-self:start}
+.pill:hover{border-color:rgba(255,255,255,.35)}
+.sect{font-family:var(--mono);font-size:13px;color:var(--dim)}.sect b{color:var(--mint);font-weight:500}
+.count{justify-self:end;font-family:var(--mono);font-size:13px;color:var(--mute)}
+.bar{position:absolute;left:0;bottom:-1px;height:2px;background:linear-gradient(90deg,var(--mint),var(--vio));transition:width .35s}
+main{position:relative;z-index:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;overflow:auto;display:none;padding:28px 0}
+.slide.on{display:block;animation:in .45s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wrap{min-height:100%;display:flex;flex-direction:column;justify-content:center;max-width:900px;margin:0 auto;padding:0 32px}
+.center{align-items:center;text-align:center}
+.kick{display:flex;align-items:center;gap:12px;color:var(--mint);font-weight:700;font-size:16px;margin-bottom:18px}
+.kick::before{content:'';width:22px;height:2px;background:var(--mint)}
+h1{margin:0;font-size:clamp(40px,6.2vw,68px);line-height:1.18;font-weight:900;letter-spacing:-.03em}
+h1 em,h2 em{font-style:normal;background:linear-gradient(90deg,var(--vio),var(--mint),#A9C4F5);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{margin:0 0 26px;font-size:clamp(26px,3.6vw,40px);line-height:1.28;font-weight:900;letter-spacing:-.025em}
+h3{margin:0;font-size:19px;font-weight:700}
+p{margin:0}
+.lead{margin-top:26px;font-size:18px;line-height:1.75;color:#CFCAEE;max-width:640px}
+.meta{display:flex;gap:44px;margin-top:34px;justify-content:center}
+.meta div{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mute)}.meta strong{font-size:15px;color:#DCD8F5}
+.cta{margin-top:36px;display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:16px;color:#07140F;background:var(--mint);border:0;border-radius:999px;padding:15px 34px;cursor:pointer;box-shadow:0 0 36px rgba(52,227,178,.28);text-decoration:none}
+.cta.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.cards{display:grid;gap:18px}.c3{grid-template-columns:repeat(3,minmax(0,1fr))}.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.015));padding:26px 26px 24px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card .num{font-family:var(--mono);font-size:14px;color:var(--mint)}
+.card p,.card li{font-size:15px;line-height:1.7;color:#BDB8DC}
+.card ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.card li{display:flex;gap:10px}.card li::before{content:'';flex:none;width:6px;height:6px;margin-top:11px;border-radius:50%;background:var(--mint)}
+.big{position:absolute;right:14px;top:-12px;font-size:110px;font-weight:900;color:rgba(255,255,255,.045);line-height:1;pointer-events:none}
+.toc{cursor:pointer;min-height:250px;text-align:left;font:inherit;color:inherit;transition:border-color .2s,transform .2s}
+.toc:hover{border-color:rgba(52,227,178,.5);transform:translateY(-3px)}
+.toc h3{font-size:25px;margin-top:6px}
+.toc .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mute)}
+.toc .foot span:first-child{border:1px solid var(--line);border-radius:999px;padding:5px 12px}.toc .foot span:last-child{color:var(--mint)}
+.note{margin-top:22px;font-size:16px;line-height:1.7;color:#CFCAEE}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.ex{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--mint);border:1px solid rgba(52,227,178,.35);background:rgba(52,227,178,.06);border-radius:999px;padding:8px 16px;text-decoration:none}
+.ex:hover{background:rgba(52,227,178,.14)}
+.ex small{color:var(--dim);font-family:var(--mono);font-size:11px}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}
+.step{border:1px solid var(--line);border-radius:20px;background:var(--glass);padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0;position:relative}
+.step+.step::before{content:'→';position:absolute;left:-17px;top:50%;transform:translateY(-50%);color:var(--mint);font-size:18px;background:var(--bg);width:20px;text-align:center}
+.step .num{font-family:var(--mono);font-size:13px;color:var(--mint)}
+.step h3{font-size:16px;line-height:1.4}.step p{font-size:13.5px;line-height:1.6;color:var(--mute)}
+.thumb{height:150px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(255,255,255,.04);overflow:hidden}
+.thumb img{height:100%;width:auto;display:block;border-radius:6px}
+.thumb.txt{font-size:13px;line-height:1.6;color:#DCD8F5;text-align:center;padding:0 12px}
+.quote{font-size:15px;line-height:1.8;color:#E6E2FA;border-left:3px solid var(--mint);padding:4px 0 4px 16px}
+.quote b{color:var(--mint);font-weight:500}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tell{display:flex;flex-direction:column;gap:14px}
+.tv{height:76px;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff}
+/* 팔레트 */
+.pal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.sw{background:#fff;border-radius:16px;overflow:hidden;color:var(--navy);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.sw .blk{height:112px;padding:14px;display:flex;align-items:flex-end;font-weight:700;font-size:15px}
+.sw .nm{padding:12px 14px 14px;font-size:16px;font-weight:500}.sw .hx{display:block;margin-top:2px;font-family:var(--mono);font-size:13px;color:#6B6890}
+.neu{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;align-items:center;font-size:13px;color:var(--mute)}
+.neu span.d{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 8px}
+.neu i{width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.2)}
+.ratio{display:flex;height:64px;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.ratio div{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.rl{display:flex;margin-top:10px;font-size:13px;color:var(--mute)}.rl div{text-align:center}
+.mini{background:#FAF9FF;color:var(--navy);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.mini .tag{align-self:flex-start;background:var(--peach);color:var(--navy);font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
+.mini .hd{font-size:23px;font-weight:900;letter-spacing:-.02em;line-height:1.3}
+.mini .bd{font-size:13.5px;line-height:1.65;color:#6B6890}
+.mini .bt{align-self:flex-start;background:var(--main);color:#fff;font-size:14px;font-weight:700;padding:11px 20px;border-radius:10px}
+.sp{display:flex;align-items:flex-end;gap:14px;height:120px}
+.sp div{display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--mute)}
+.sp i{display:block;width:44px;background:linear-gradient(180deg,var(--vio),var(--main));border-radius:6px 6px 0 0}
+.chk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.chk .card{padding:18px 20px;gap:8px}
+.chk .a{font-size:13px;color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
+.chk .b{font-size:15px;font-weight:500;color:var(--ink);line-height:1.5}
+.chk .n{font-family:var(--mono);font-size:13px;color:var(--mint)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.chips span{font-size:13px;color:#DCD8F5;border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+.nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:26px;border-top:1px solid var(--line);background:rgba(7,5,15,.55);backdrop-filter:blur(8px)}
+.nb{font:inherit;font-size:15px;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:12px 26px;cursor:pointer}
+.nb:hover:not(:disabled){border-color:rgba(255,255,255,.4)}.nb:disabled{opacity:.3;cursor:default}
+.dots{display:flex;gap:9px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--dim);background:transparent;padding:0;cursor:pointer}
+.dot.done{background:#1FA882;border-color:#1FA882}.dot.cur{width:13px;height:13px;background:var(--mint);border-color:var(--mint);box-shadow:0 0 12px rgba(52,227,178,.6)}
+@media (max-width:820px){
+ body{grid-template-rows:56px 1fr 70px}.top{padding:0 14px}.sect{display:none}.top{grid-template-columns:1fr 1fr}
+ .c3,.c2,.two,.chk,.pal{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}.step+.step::before{display:none}
+ .wrap{padding:0 18px}.big{font-size:80px}.nb{padding:10px 16px}.meta{gap:24px}
+}
+
+.mp{display:grid;grid-template-columns:1fr 40px 1.1fr;gap:10px 8px;align-items:stretch}
+.mp .l,.mp .r{border:1px solid var(--line);border-radius:14px;padding:13px 18px;font-size:15px;line-height:1.5;display:flex;flex-direction:column;justify-content:center}
+.mp .l{background:var(--glass);color:#DCD8F5;font-weight:500}.mp .r{background:rgba(52,227,178,.06);border-color:rgba(52,227,178,.25);color:#E9FFF8}
+.mp .r small{color:var(--dim);font-size:12.5px;margin-top:2px;font-weight:400}
+.mp .ar{display:flex;align-items:center;justify-content:center;color:var(--mint);font-size:18px}
+.mp .hd{font-family:var(--mono);font-size:12px;color:var(--dim);padding:0 4px}
+.stg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.stg .step{padding:16px}.stg .step+.step::before{content:'→';position:absolute;left:-17px;top:92px;transform:none}
+.scr{height:176px;border-radius:12px;background:#fff;color:#111827;overflow:hidden;padding:14px;display:flex;flex-direction:column;gap:8px;font-size:12px}
+.scr .b{background:#D9DCE3;border-radius:3px}
+.scr .dash{border:1.5px dashed #9CA3AF;border-radius:2px}
+.ck{display:grid;grid-template-columns:44px 230px 1fr;gap:20px;align-items:center;padding:14px 20px;border:1px solid var(--line);border-radius:18px;background:var(--glass)}
+.ck+.ck{margin-top:12px}
+.ck .n{font-family:var(--mono);font-size:22px;color:var(--mint)}
+.ck .sp2{height:84px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ck h3{font-size:17px;margin-bottom:6px}
+.ck .q{font-size:14px;line-height:1.6;color:#BDB8DC;display:flex;flex-direction:column;gap:2px}.ck .q span::before{content:'? ';color:var(--mint);font-weight:700}
+.src{margin-top:18px;font-size:12.5px;line-height:1.6;color:var(--dim)}.src a{color:var(--mute)}
+@media (max-width:820px){.mp{grid-template-columns:1fr}.mp .ar{transform:rotate(90deg)}.stg{grid-template-columns:1fr}.ck{grid-template-columns:1fr}.stg .step+.step::before{display:none}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="top">
+  <button class="pill" id="home"><span>⌂</span>목차</button>
+  <div class="sect" id="sect">디자인 세션</div>
+  <div class="count" id="count">1 / 20</div>
+  <div class="bar" id="bar"></div>
+</div>
+<main id="stage">
+
+<!-- 0 표지 -->
+<section class="slide" data-sec="0"><div class="wrap center">
+  <h1>AI 와이어프레임에서<br><em>내 시안</em>이 되기까지</h1>
+  <p class="lead">구조는 AI가 빠르게 뽑고, 분위기와 디테일은 내가 정해요. 꼭꼭과 성분핏, 제가 직접 만든 작업으로 한 단계씩 따라가 봅니다.</p>
+  <div class="meta"><div>주제<strong>와이어프레임 · 시안 · 디테일</strong></div><div>사례<strong>꼭꼭 · 성분핏</strong></div></div>
+  <button class="cta" data-go="1">목차 보기 →</button>
+</div></section>
+
+<!-- 1 목차 -->
+<section class="slide" data-sec="0" data-name="목차"><div class="wrap center">
+  <h2>오늘 다룰 이야기</h2>
+  <p class="note" style="margin:-8px 0 34px;color:var(--mute)">뼈대를 잡고, 시안으로 키우고, 마지막 한 끗을 다듬는 순서예요.</p>
+  <div class="cards c3" style="width:100%">
+    <button class="card toc" data-go="2"><span class="big">01</span><span class="num">01</span><h3>구조 잡기</h3><p>와이어프레임을 뽑고, 그대로 쓰면 왜 비슷해 보이는지.</p><div class="foot"><span>5개 슬라이드</span><span>보기 →</span></div></button>
+    <button class="card toc" data-go="7"><span class="big">02</span><span class="num">02</span><h3>시안 발전</h3><p>배치와 프롬프트로 첫 시안을 뽑고, 나머지 화면으로 넓히는 법.</p><div class="foot"><span>5개 슬라이드</span><span>보기 →</span></div></button>
+    <button class="card toc" data-go="12"><span class="big">03</span><span class="num">03</span><h3>디테일 한 끗</h3><p>글꼴, 색, 여백, 그리고 AI티 체크리스트.</p><div class="foot"><span>7개 슬라이드</span><span>보기 →</span></div></button>
+  </div>
+</div></section>
+
+<!-- A1 -->
+<section class="slide" data-sec="1"><div class="wrap">
+  <div class="kick">시작하며</div>
+  <h2>시안 한 장은 <em>세 번</em> 손봐서 완성돼요</h2>
+  <div class="cards c3">
+    <div class="card"><span class="big">1</span><span class="num">STEP 1</span><h3>구조</h3><p>어디에 무엇이 들어갈지 정하는 단계. 와이어프레임이 여기에 해당해요.</p></div>
+    <div class="card"><span class="big">2</span><span class="num">STEP 2</span><h3>컨셉</h3><p>색, 이미지, 분위기를 얹어 서비스다운 얼굴을 만드는 단계예요.</p></div>
+    <div class="card"><span class="big">3</span><span class="num">STEP 3</span><h3>디테일</h3><p>글꼴, 색의 역할, 여백을 다듬어 “AI티”를 빼는 마지막 단계예요.</p></div>
+  </div>
+  <p class="note">구조는 AI에게 맡기고, 컨셉과 디테일은 내 손으로. 오늘 이야기의 뼈대입니다.</p>
+</div></section>
+
+<!-- A 기획서 -->
+<section class="slide" data-sec="1"><div class="wrap">
+  <div class="kick">기획서</div>
+  <h2>구조는 <em>기획서</em>를 보고 잡아요</h2>
+  <div class="mp">
+    <div class="hd">기획서 항목</div><div></div><div class="hd">화면에서 맡는 자리</div>
+    <div class="l">문제 정의 · 타겟 니즈</div><div class="ar">→</div><div class="r">공감 섹션, 히어로 문구<small>예: 성분핏 “이런 고민, 성분핏이 도와드려요”</small></div>
+    <div class="l">서비스 개요 · 핵심 기능</div><div class="ar">→</div><div class="r">서비스 한눈에 보기, 핵심 화면의 흐름</div>
+    <div class="l">기존 서비스 대비 차별점</div><div class="ar">→</div><div class="r">비교 섹션<small>예: 성분핏 “광고성 리뷰 말고 데이터로 비교하세요”</small></div>
+    <div class="l">AI 기술 적용</div><div class="ar">→</div><div class="r">결과와 근거를 보여주는 화면<small>예: 가성비 지수 산출 방식</small></div>
+    <div class="l">향후 발전 방향</div><div class="ar">→</div><div class="r">로드맵 섹션<small>예: 성분핏 “만들어갈 다음 모습”</small></div>
+  </div>
+  <p class="note">기획서를 AI에게 함께 주면 “무슨 서비스인지”가 반영된 구조를 뽑기 쉬워요. 항목 연결은 예시이고, 서비스마다 달라져요.</p>
+</div></section>
+
+<!-- A2 -->
+<section class="slide" data-sec="1" data-name="구조 잡기"><div class="wrap">
+  <div class="kick">와이어프레임</div>
+  <h2>과거엔 직접, 지금은 <em>AI로 뼈대부터</em></h2>
+  <div class="two">
+    <div class="card"><span class="num">과거</span><h3>피그마에서 한 칸씩 직접</h3><ul><li>구조, 여백, 문구를 전부 손으로 잡았어요</li><li>의도가 분명한 대신 손이 많이 가요</li><li>성분핏 메인이 이렇게 시작됐어요</li></ul></div>
+    <div class="card"><span class="num">지금</span><h3>AI로 와이어프레임을 먼저</h3><ul><li>배치와 흐름을 빠르게 얻어요</li><li>컨셉은 내가 가져온 이미지로 정해요</li><li>프롬프트로 시안까지 이어가요</li></ul></div>
+  </div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t1-1" target="_blank" rel="noopener">피그마 시안 vs AI 와이어프레임 ↗</a></div>
+</div></section>
+
+<!-- A 3단계 -->
+<section class="slide" data-sec="1"><div class="wrap">
+  <div class="kick">차이 보기</div>
+  <h2>와이어프레임 → <em>콘텐츠 채우기</em> → 디자인</h2>
+  <div class="stg">
+    <div class="step"><span class="num">① 와이어프레임</span>
+      <div class="scr"><div class="b" style="width:40%;height:8px"></div><div style="display:flex;gap:10px;flex:1"><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding-top:6px"><div class="b" style="width:90%;height:14px"></div><div class="b" style="width:60%;height:14px"></div><div class="b" style="width:80%;height:6px"></div><div class="dash" style="width:60px;height:20px;margin-top:4px"></div></div><div class="dash" style="width:76px"></div></div><div style="display:flex;gap:6px"><div class="dash" style="flex:1;height:30px"></div><div class="dash" style="flex:1;height:30px"></div><div class="dash" style="flex:1;height:30px"></div></div></div>
+      <h3>자리만 정해요</h3><p>어디에 제목, 이미지, 버튼이 들어갈지 정해요.</p></div>
+    <div class="step"><span class="num">② 콘텐츠를 채운 와이어프레임</span>
+      <div class="scr"><div style="font-weight:700">모닝빈</div><div style="display:flex;gap:10px;flex:1"><div style="flex:1;display:flex;flex-direction:column;gap:4px;padding-top:4px"><div style="font-size:17px;font-weight:700;line-height:1.25">아침이 기다려지는<br>원두 구독</div><div style="font-size:10.5px;color:#4B5563;line-height:1.5">스페셜티 원두를 집 앞으로.</div><div style="border:1px solid #111827;align-self:flex-start;padding:2px 8px;font-size:10px">첫 구독 시작하기</div></div><div class="dash" style="width:76px;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:10px">상품 이미지</div></div><div style="display:flex;gap:6px;font-size:10px"><div style="flex:1;border:1px solid #D1D5DB;padding:5px">01 취향 진단</div><div style="flex:1;border:1px solid #D1D5DB;padding:5px">02 갓 볶은 배송</div><div style="flex:1;border:1px solid #D1D5DB;padding:5px">03 건너뛰기</div></div></div>
+      <h3>실제 문구·숫자·이미지를 넣어요</h3><p>글이 넘치는지, 비어 보이는지 이때 드러나요. AI 와이어프레임은 보통 여기까지 뽑아줘요.</p></div>
+    <div class="step"><span class="num">③ 디자인</span>
+      <div class="scr" style="background:#F6F0E6;color:#2B211B"><div style="font-weight:900;font-size:12px">모닝빈</div><div style="display:flex;gap:10px;flex:1"><div style="flex:1;display:flex;flex-direction:column;gap:4px;padding-top:4px"><div style="font-size:9px;letter-spacing:.12em;color:#A64A28;font-weight:700">SPECIALTY COFFEE</div><div style="font-size:18px;font-weight:900;line-height:1.2;letter-spacing:-.02em">아침이 기다려지는<br>원두 구독</div><div style="background:#2B211B;color:#F6F0E6;align-self:flex-start;padding:4px 10px;font-size:10.5px;font-weight:700;margin-top:4px">첫 구독 시작하기</div></div><div style="width:64px;background:#A64A28;border-radius:4px 4px 8px 8px;display:flex;align-items:center;justify-content:center"><div style="width:44px;height:58px;background:#F6F0E6;border-radius:2px"></div></div></div><div style="display:flex;gap:8px;font-size:10px;border-top:2px solid #2B211B;padding-top:5px"><span style="color:#A64A28;font-weight:900">01</span><span style="color:#A64A28;font-weight:900">02</span><span style="color:#A64A28;font-weight:900">03</span></div></div>
+      <h3>글꼴·색·여백을 입혀요</h3><p>같은 구조가 서비스의 얼굴이 돼요.</p></div>
+  </div>
+  <p class="note">성분핏도 같아요. 피그마 시안이 문구와 이미지를 채운 와이어프레임 단계였고, 실제 구현이 디자인까지 입힌 단계예요.</p>
+  <div class="links"><a class="ex" href="design-session-examples.html#t1-2" target="_blank" rel="noopener">3단계 크게 보기 ↗</a><a class="ex" href="design-session-examples.html#t4-9" target="_blank" rel="noopener">성분핏 한 장으로 보기 ↗</a></div>
+</div></section>
+
+<!-- A3 -->
+<section class="slide" data-sec="1"><div class="wrap">
+  <div class="kick">주의</div>
+  <h2>와이어프레임을 그대로 칠하면 <em>다 비슷해 보여요</em></h2>
+  <div class="cards c3">
+    <div class="card tell"><div class="tv" style="background:#fff"><div style="width:70%;height:34px;border-radius:8px;background:linear-gradient(90deg,#5B3FD6,#2F6BEA)"></div></div><h3>보라→파랑 그라데이션</h3><p>가장 흔한 AI 기본값이에요.</p></div>
+    <div class="card tell"><div class="tv" style="background:#fff"><div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#5B3FD6,#2F6BEA);display:flex;align-items:center;justify-content:center;font-size:22px">☕</div></div><h3>이모지 아이콘 박스</h3><p>그라데이션 박스 안의 이모지예요.</p></div>
+    <div class="card tell"><div class="tv" style="background:#fff;flex-direction:column;gap:6px"><div style="width:110px;height:8px;border-radius:3px;background:#1E1B3A"></div><div style="width:74px;height:6px;border-radius:3px;background:#CFCBE6"></div><div style="width:40px;height:9px;border-radius:3px;background:#8A86A8"></div></div><h3>전부 가운데 정렬</h3><p>무게중심이 없어 밋밋해 보여요.</p></div>
+  </div>
+  <p class="note">뼈대는 쓰되, 컨셉을 얹어야 AI티가 빠져요.</p>
+  <div class="links"><a class="ex" href="design-session-examples.html#t1-3" target="_blank" rel="noopener">와이어프레임 vs 그대로 색칠 ↗</a></div>
+</div></section>
+
+<!-- B1 -->
+<section class="slide" data-sec="2" data-name="시안 발전"><div class="wrap">
+  <div class="kick">꼭꼭</div>
+  <h2>구조는 AI, <em>분위기는 내가</em> 정해요</h2>
+  <div class="flow">
+    <div class="step"><span class="num">STEP 1</span><div class="thumb"><img alt="AI 와이어프레임" src="data:image/jpeg;base64,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"></div><h3>AI 와이어프레임</h3><p>구조와 흐름만 먼저 뽑아요.</p></div>
+    <div class="step"><span class="num">STEP 2</span><div class="thumb"><img alt="포토샵 배치" src="data:image/jpeg;base64,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"></div><h3>이미지 가져와 대충 배치</h3><p>포토샵으로 구도만 잡아요.</p></div>
+    <div class="step"><span class="num">STEP 3</span><div class="thumb txt">배치 이미지<br>+ 프롬프트</div><h3>프롬프트로 시안</h3><p>컬러와 분위기를 말로 적어요.</p></div>
+    <div class="step"><span class="num">STEP 4</span><div class="thumb txt">같은 테마로<br>나머지 화면</div><h3>마음에 들면 확장</h3><p>정한 컨셉을 이어 적용해요.</p></div>
+  </div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t2-2" target="_blank" rel="noopener">꼭꼭 과정 보기 ↗</a></div>
+</div></section>
+
+<!-- B2 -->
+<section class="slide" data-sec="2"><div class="wrap">
+  <div class="kick">프롬프트</div>
+  <h2>프롬프트에는 <em>이 네 가지</em>를 적었어요</h2>
+  <div class="cards c2">
+    <div class="card"><span class="num">구도</span><h3>배치 이미지를 첨부</h3><div class="quote">“<b>이 구도로</b> 메인 랜딩페이지 시안을 만들어줘.”</div></div>
+    <div class="card"><span class="num">컬러</span><h3>색을 말로 구체적으로</h3><div class="quote">“<b>따뜻한 파스텔 톤</b>, 주황기 도는 핑크”</div></div>
+    <div class="card"><span class="num">유지할 것</span><h3>그대로 둘 부분</h3><div class="quote">“상단·하단은 기존 것을 가져오되 <b>전체 분위기는 통일</b>”</div></div>
+    <div class="card"><span class="num">분위기·움직임</span><h3>느낌과 동작</h3><div class="quote">“버튼은 <b>둥둥 떠다니는</b> 애니메이션, 픽셀 느낌, 친근하고 게임 같은 분위기”</div></div>
+  </div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t2-3" target="_blank" rel="noopener">프롬프트 원문 보기 ↗</a></div>
+</div></section>
+
+<!-- B3 -->
+<section class="slide" data-sec="2"><div class="wrap">
+  <div class="kick">확장</div>
+  <h2>시안이 마음에 들면 <em>같은 테마로</em> 나머지 화면까지</h2>
+  <div class="two">
+    <div class="card"><span class="num">프롬프트 ②</span><div class="quote">“이 컨셉으로 나머지 화면도 같은 디자인 테마로 만들어줘. 특히 ‘지난 게시물 점검’ 카드는 이름·나이·유치원 옆에 <b>픽셀 형태 아이콘</b>을 넣어서, 메인과 비슷한 컨셉으로.”</div></div>
+    <div class="card"><span class="num">결과</span><h3>메인의 규칙이 그대로 이어져요</h3><ul><li>같은 컬러와 글꼴, 두꺼운 테두리</li><li>점검 카드에는 항목마다 픽셀 아이콘</li><li>이름·나이·유치원·동네·등원 시간</li></ul></div>
+  </div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t2-5" target="_blank" rel="noopener">메인과 점검 카드 보기 ↗</a></div>
+</div></section>
+
+<!-- B4 -->
+<section class="slide" data-sec="2"><div class="wrap">
+  <div class="kick">성분핏</div>
+  <h2>직접 만든 구조에 컨셉을 입혀 <em>빈 곳을 채웠어요</em></h2>
+  <div class="two">
+    <div class="card"><span class="num">바뀐 곳</span><ul><li>히어로: 흰 배경에서 보라 풀 배경으로, 강조 단어는 민트색</li><li>데이터 비교: 비교표에서 실제 화면 미리보기로</li><li>가성비 지수: 수식에서 도넛 차트와 계산기로</li></ul></div>
+    <div class="card"><span class="num">Figma에 없던 곳</span><h3>같은 컨셉으로 새로 채웠어요</h3><div class="chips"><span>이런 고민</span><span>4가지 질문 피부 진단</span><span>만들어갈 다음 모습</span></div></div>
+  </div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t4-1" target="_blank" rel="noopener">섹션별 Before / After ↗</a><a class="ex" href="design-session-examples.html#t4-9" target="_blank" rel="noopener">한 장으로 보기 ↗</a></div>
+</div></section>
+
+<!-- B5 배포·테스트 -->
+<section class="slide" data-sec="2"><div class="wrap">
+  <div class="kick">마지막으로</div>
+  <h2>디자인이 끝나도 <em>배치는 한 번 더</em> 손봐요</h2>
+  <div class="cards c3">
+    <div class="card"><span class="num">비율</span><h3>화면 크기가 바뀌어요</h3><p>PC 기준 와이어프레임의 2열이 모바일에서는 1열로 쌓여요. 이미지가 잘리거나 커지기도 해요.</p></div>
+    <div class="card"><span class="num">줄바꿈</span><h3>글이 달리 끊겨요</h3><p>좁은 화면에서는 제목이 어색한 곳에서 끊기고, 버튼 문구가 두 줄로 넘칠 수 있어요.</p></div>
+    <div class="card"><span class="num">실제 기기</span><h3>폰에서만 보이는 문제</h3><p>주소창이나 하단 바에 버튼이 가려지는 일은 배포해서 열어 봐야 알 수 있어요.</p></div>
+  </div>
+  <p class="note">와이어프레임과 시안은 한 화면 기준이라, 배포하고 테스트하면서 배치를 다시 다듬는 게 정상이에요. 특히 모바일이 그래요.</p>
+  <div class="links"><a class="ex" href="design-session-examples.html#t2-6" target="_blank" rel="noopener">배포·테스트 단계 보기 ↗</a></div>
+</div></section>
+
+<!-- C1 -->
+<section class="slide" data-sec="3" data-name="디테일 한 끗"><div class="wrap">
+  <div class="kick">글꼴</div>
+  <h2>글꼴·굵기·크기만 바꿔도 <em>달라져요</em></h2>
+  <div class="cards c3">
+    <div class="card"><span class="num">규칙 1</span><h3>제목은 굵고 크게</h3><p>명조 계열의 굵은 글꼴이나 개성 있는 글꼴로 첫인상을 정해요.</p></div>
+    <div class="card"><span class="num">규칙 2</span><h3>본문은 연하고 작게</h3><p>제목과 크기·굵기·색 차이를 크게 두면 읽는 순서가 생겨요.</p></div>
+    <div class="card"><span class="num">규칙 3</span><h3>라벨은 작게, 자간은 넓게</h3><p>영문 라벨은 작게 두고 글자 사이를 살짝 벌려요.</p></div>
+  </div>
+  <p class="note">꼭꼭은 기본 고딕에서 둥근 글꼴로, 성분핏은 제목 굵기·크기·강조색을 바꿨어요.</p>
+  <div class="links"><a class="ex" href="design-session-examples.html#t3-1" target="_blank" rel="noopener">원리 예시 ↗</a><a class="ex" href="design-session-examples.html#t3-2" target="_blank" rel="noopener">꼭꼭·성분핏 실제 사례 ↗</a></div>
+</div></section>
+
+<!-- C2 -->
+<section class="slide" data-sec="3"><div class="wrap">
+  <div class="kick">색 ①</div>
+  <h2>색은 <em>역할</em>로 나눠요</h2>
+  <div class="pal">
+    <div class="sw"><div class="blk" style="background:#5B4FE0;color:#fff">메인</div><div class="nm">인디고 바이올렛<span class="hx">#5B4FE0</span></div></div>
+    <div class="sw"><div class="blk" style="background:#FFC2A8;color:#1E1B3A">포인트</div><div class="nm">피치<span class="hx">#FFC2A8</span></div></div>
+    <div class="sw"><div class="blk" style="background:#1E1B3A;color:#fff">글자</div><div class="nm">잉크 네이비<span class="hx">#1E1B3A</span></div></div>
+  </div>
+  <div class="neu"><span>+ 중립색(예시)</span><span class="d"><i style="background:#FAF9FF"></i>배경 #FAF9FF</span><span class="d"><i style="background:#E4E1F5"></i>구분선 #E4E1F5</span><span class="d"><i style="background:#6B6890"></i>보조 글자 #6B6890</span></div>
+  <p class="note">메인은 버튼과 강조, 포인트는 작은 하이라이트, 글자는 순검정 대신 어두운 남색으로 정해 두면 흔들리지 않아요.</p>
+</div></section>
+
+<!-- C3 -->
+<section class="slide" data-sec="3"><div class="wrap">
+  <div class="kick">색 ②</div>
+  <h2>비율은 대략 <em>60 · 30 · 10</em></h2>
+  <div class="two" style="align-items:center">
+    <div>
+      <div class="ratio"><div style="width:60%;background:#FAF9FF;color:#1E1B3A">배경 60</div><div style="width:30%;background:#5B4FE0;color:#fff">메인 30</div><div style="width:10%;background:#FFC2A8;color:#1E1B3A">10</div></div>
+      <div class="rl"><div style="width:60%">배경·여백</div><div style="width:30%">메인</div><div style="width:10%">포인트</div></div>
+      <p class="note">글자색은 비율 밖에서 가독성을 우선해요. 색이 너무 많거나 그라데이션이 겹치면 AI 기본값처럼 보여요.</p>
+    </div>
+    <div class="mini"><span class="tag">첫 구독 10% 할인</span><div class="hd">아침이 기다려지는<br>원두 구독</div><div class="bd">취향에 맞춰 고른 원두를 집 앞으로 보내드려요.</div><span class="bt">구독 시작하기</span></div>
+  </div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t3-4" target="_blank" rel="noopener">색 원리 · 팔레트 예시 ↗</a></div>
+</div></section>
+
+<!-- C4 -->
+<section class="slide" data-sec="3"><div class="wrap">
+  <div class="kick">여백</div>
+  <h2>여백은 <em>8의 배수</em>로 맞춰요</h2>
+  <div class="two" style="align-items:center">
+    <div class="card"><span class="num">자주 쓰는 간격</span><div class="sp"><div><i style="height:12px"></i>8</div><div><i style="height:24px"></i>16</div><div><i style="height:36px"></i>24</div><div><i style="height:48px"></i>32</div><div><i style="height:72px"></i>48</div><div><i style="height:96px"></i>64</div></div></div>
+    <div class="card"><span class="num">왜 맞출까요</span><ul><li>6, 11, 13, 19px처럼 들쭉날쭉하면 정리가 안 된 느낌이 나요</li><li>8의 배수로 맞추면 리듬이 생겨요</li><li>제목과 본문 사이는 넓게, 항목 사이는 좁게</li></ul></div>
+  </div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t3-5" target="_blank" rel="noopener">여백 Before / After ↗</a></div>
+</div></section>
+
+<!-- C5 점검 1 -->
+<section class="slide" data-sec="3"><div class="wrap">
+  <div class="kick">AI티 점검 ①</div>
+  <h2>색 · 아이콘 · 카드, <em>내가 골랐나?</em></h2>
+  <div class="ck"><span class="n">1</span><div class="sp2"><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:130px;height:26px;border-radius:7px;background:linear-gradient(90deg,#5B3FD6,#2F6BEA)"></div><div style="font-size:14px;font-weight:700;background:linear-gradient(90deg,#5B3FD6,#2F6BEA);-webkit-background-clip:text;background-clip:text;color:transparent">당신의 아침을 바꾸는</div></div></div><div><h3>보라→파랑 그라데이션</h3><div class="q"><span>이 서비스의 성격에서 나온 색인가요?</span><span>메인·포인트·글자로 역할을 정했나요?</span></div></div></div>
+  <div class="ck"><span class="n">2</span><div class="sp2"><div style="display:flex;gap:10px"><div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5B3FD6,#2F6BEA);display:flex;align-items:center;justify-content:center;font-size:19px">☕</div><div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5B3FD6,#2F6BEA);display:flex;align-items:center;justify-content:center;font-size:19px">🚚</div><div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5B3FD6,#2F6BEA);display:flex;align-items:center;justify-content:center;font-size:19px">⏰</div></div></div><div><h3>그라데이션 박스 속 이모지</h3><div class="q"><span>이 아이콘이 정보를 주나요, 장식인가요?</span><span>숫자나 선 아이콘, 글자만으로 충분하지 않나요?</span></div></div></div>
+  <div class="ck"><span class="n">3</span><div class="sp2"><div style="display:flex;gap:8px"><div style="width:52px;height:52px;border-radius:10px;background:#fff;box-shadow:0 6px 14px rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><div style="width:16px;height:16px;border-radius:5px;background:#E0E7FF"></div><div style="width:32px;height:5px;border-radius:2px;background:#CBD5E1"></div></div><div style="width:52px;height:52px;border-radius:10px;background:#fff;box-shadow:0 6px 14px rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><div style="width:16px;height:16px;border-radius:5px;background:#E0E7FF"></div><div style="width:32px;height:5px;border-radius:2px;background:#CBD5E1"></div></div><div style="width:52px;height:52px;border-radius:10px;background:#fff;box-shadow:0 6px 14px rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><div style="width:16px;height:16px;border-radius:5px;background:#E0E7FF"></div><div style="width:32px;height:5px;border-radius:2px;background:#CBD5E1"></div></div></div></div><div><h3>똑같은 둥근 카드 3장 + 옅은 그림자</h3><div class="q"><span>세 가지 정보의 중요도가 정말 같은가요?</span><span>카드 없이 선과 여백으로 구분되나요?</span></div></div></div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t5-1" target="_blank" rel="noopener">크게 보기 ↗</a></div>
+</div></section>
+
+<!-- C5 점검 2 -->
+<section class="slide" data-sec="3"><div class="wrap">
+  <div class="kick">AI티 점검 ②</div>
+  <h2>구조 · 글꼴 · 문구, <em>이 서비스의 선택인가?</em></h2>
+  <div class="ck"><span class="n">4</span><div class="sp2"><div style="display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:90px;height:6px;border-radius:2px;background:#1E293B"></div><div style="width:60px;height:5px;border-radius:2px;background:#CBD5E1"></div><div style="width:40px;height:9px;border-radius:5px;background:#6366F1"></div><div style="display:flex;gap:5px;margin-top:3px"><div style="width:38px;height:22px;border-radius:4px;background:#EEF2FF"></div><div style="width:38px;height:22px;border-radius:4px;background:#EEF2FF"></div><div style="width:38px;height:22px;border-radius:4px;background:#EEF2FF"></div></div></div></div><div><h3>가운데 정렬 + 늘 같은 순서</h3><div class="q"><span>처음 눈이 닿는 곳은 어디인가요?</span><span>이 순서는 기획서가 정했나요, 템플릿이 정했나요?</span></div></div></div>
+  <div class="ck"><span class="n">5</span><div class="sp2"><div style="text-align:center;font-size:15px;line-height:1.5;color:#1D2733">아침이 기다려지는 원두 구독<br>취향에 맞춰 고른 스페셜티 원두</div></div><div><h3>기본 글꼴, 한 가지 굵기</h3><div class="q"><span>제목과 본문의 역할이 굵기·크기로 구분되나요?</span><span>서비스 분위기에 맞는 글꼴을 골랐나요?</span></div></div></div>
+  <div class="ck"><span class="n">6</span><div class="sp2"><div style="text-align:center;font-size:13px;line-height:1.6;color:#1D2733;padding:0 12px">최고급 원두로 완벽한 커피 경험을 만나보세요<br>혁신적인 구독으로 일상을 업그레이드</div></div><div><h3>누구에게나 맞는 문구</h3><div class="q"><span>이 서비스만 말할 수 있는 문장인가요?</span><span>숫자, 실제 기능, 사례가 들어갔나요?</span></div></div></div>
+  <div class="links"><a class="ex" href="design-session-examples.html#t5-2" target="_blank" rel="noopener">크게 보기 ↗</a></div>
+</div></section>
+
+<!-- C5 고쳐도 남는 AI티 -->
+<section class="slide" data-sec="3"><div class="wrap">
+  <div class="kick">주의</div>
+  <h2>고쳐도 남는 <em>AI티</em></h2>
+  <div class="two">
+    <div class="card"><span class="num">새 기본값</span><h3>“AI티 없애는 법”도 흔해졌어요</h3><ul><li>크림 배경 + 명조 제목 + 포인트 한 색 조합이 이제 또 하나의 기본값으로 꼽혀요 (셋 중 둘만 겹쳐도 강한 신호)</li><li>왼쪽 정렬 + 한쪽 이미지 + 01·02·03 번호도 흔한 틀이에요</li><li>오늘 보여드린 모닝빈 예시도 여기에 해당해요</li></ul></div>
+    <div class="card"><span class="num">그래서</span><h3>이렇게 정해요</h3><ul><li>레퍼런스 2~3개를 직접 고르기</li><li>내 이미지와 실제 데이터를 넣고 보기</li><li>기획서의 서비스 성격에서 색·글꼴을 고른 이유를 한 줄씩 적기</li></ul></div>
+  </div>
+  <p class="note">AI티는 나쁜 디자인이라는 뜻이 아니라, 내가 고르지 않은 선택이 쌓인 모습이에요.</p>
+  <p class="src">참고: <a href="https://github.com/Laith0003/ux-skill/wiki/How-to-detect-AI-slop-in-your-design" target="_blank" rel="noopener">How to detect AI slop in your design</a> · <a href="https://www.superdesign.dev/blog/why-ai-design-looks-generic" target="_blank" rel="noopener">Why AI design looks generic</a> · <a href="https://claudecodehq.com/playbooks/unslop-ui" target="_blank" rel="noopener">unslop ui</a></p>
+  <div class="links"><a class="ex" href="design-session-examples.html#t5-3" target="_blank" rel="noopener">크게 보기 ↗</a></div>
+</div></section>
+
+<!-- 끝 -->
+<section class="slide" data-sec="0" data-name="마무리"><div class="wrap center">
+  <div class="kick" style="justify-content:center">마무리</div>
+  <h2>구조는 AI, <em>분위기와 디테일은 내 손</em></h2>
+  <p class="lead" style="margin-top:0">뼈대는 AI가 빠르게 뽑아 주니, 내 시간은 컨셉과 디테일에 쓰면 돼요. 오늘 본 사례를 직접 눌러서 확인해 보세요.</p>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center"><a class="cta" href="design-session-examples.html" target="_blank" rel="noopener">예시 사이트 열기 ↗</a><button class="cta ghost" data-go="0">처음으로 ↺</button></div>
+  <div class="chips" style="justify-content:center;margin-top:28px"><span>와이어프레임</span><span>시안</span><span>디테일</span></div>
+</div></section>
+
+</main>
+<div class="nav"><button class="nb" id="prev">◀ 이전</button><div class="dots" id="dots"></div><button class="nb" id="next">다음 ▶</button></div>
+
+<script>
+(function(){
+var S=[].slice.call(document.querySelectorAll('.slide')),N=S.length,I=0;
+var SEC=['','구조 잡기','시안 발전','디테일 한 끗'];
+// 슬라이드별 섹션 번호: 0~1 표지/목차, 2~4 구조, 5~8 시안, 9~13 디테일, 14 마무리
+function secOf(i){return i<2?0:i<7?1:i<12?2:i<19?3:0}
+function range(s){return s===1?[2,6]:s===2?[7,11]:s===3?[12,18]:null}
+var $=function(id){return document.getElementById(id)};
+function show(i,noHash){
+  I=Math.max(0,Math.min(N-1,i));
+  S.forEach(function(el,k){el.classList.toggle('on',k===I)});
+  S[I].scrollTop=0;
+  var s=secOf(I),r=range(s);
+  $('count').textContent=(I+1)+' / '+N;
+  $('bar').style.width=((I+1)/N*100)+'%';
+  $('sect').innerHTML=I===0?'디자인 세션':I===1?'<b>목차</b>':I===N-1?'<b>마무리</b>':'<b>'+SEC[s]+'</b> · '+(I-r[0]+1)+' / '+(r[1]-r[0]+1);
+  var d=$('dots');d.innerHTML='';
+  var items=r?[].concat(Array.apply(null,{length:r[1]-r[0]+1}).map(function(_,k){return r[0]+k})):[0,1,N-1];
+  items.forEach(function(k){var b=document.createElement('button');b.className='dot'+(k===I?' cur':(k<I&&r?' done':''));b.setAttribute('aria-label',(k+1)+'번 슬라이드');b.onclick=function(){show(k)};d.appendChild(b)});
+  $('prev').disabled=I===0;$('next').disabled=I===N-1;
+  if(!noHash)history.replaceState(null,'','#s'+(I+1));
+}
+$('prev').onclick=function(){show(I-1)};$('next').onclick=function(){show(I+1)};
+$('home').onclick=function(){show(1)};
+[].forEach.call(document.querySelectorAll('[data-go]'),function(b){b.onclick=function(){show(+b.dataset.go)}});
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' ')show(I+1);
+  else if(e.key==='ArrowLeft'||e.key==='PageUp')show(I-1);
+  else if(e.key==='Home')show(0);else if(e.key==='End')show(N-1);
+});
+var tx=null;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>70)show(dx<0?I+1:I-1);tx=null});
+function fromHash(){var m=/^#s(\d+)$/.exec(location.hash);show(m?+m[1]-1:0,!m)}
+window.addEventListener('hashchange',fromHash);fromHash();
+// 배경 입자
+var cv=$('fx'),cx=cv.getContext('2d'),P=[],W,H;
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+rs();addEventListener('resize',rs);
+for(var k=0;k<46;k++)P.push({x:Math.random(),y:Math.random(),r:Math.random()*1.8+.6,v:Math.random()*.00006+.00002,c:Math.random()<.7?'52,227,178':'139,124,246',a:Math.random()*.5+.2,t:Math.random()*6});
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+ (function loop(t){cx.clearRect(0,0,W,H);P.forEach(function(p){p.y-=p.v*16;if(p.y<0)p.y=1;var a=p.a*(.6+.4*Math.sin(t/1400+p.t));cx.fillStyle='rgba('+p.c+','+a+')';cx.beginPath();cx.arc(p.x*W,p.y*H,p.r,0,6.3);cx.fill()});requestAnimationFrame(loop)})(0);
+}
+})();
+</script>
+</body>
+</html>
